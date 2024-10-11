@@ -5,7 +5,7 @@ namespace Players_API.Models.Entities;
 
 public record PlayersList
 {
-    public required IEnumerable<Player> Players { get; set; }
+    public required List<Player> Players { get; set; }
 }
 
 public record Player
@@ -40,12 +40,4 @@ public record PlayerData
     public int Height { get; set; }
     public int Age { get; set; }
     public required int[] Last { get; set; }
-}
-
-// May not be the best place to store the stats models as it's computed values and not part of the base entity
-// TODO: Move to players service or create a DTO ?
-public record CountryStats
-{
-    public required string CountryCode { get; set; }
-    public required IEnumerable<float> PlayersRatios { get; set; }
 }
