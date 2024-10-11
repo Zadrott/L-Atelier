@@ -1,6 +1,6 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Players_API.Models.Entities;
+using Players_API.Models.Services;
 
 namespace Players_API.Controllers;
 
@@ -8,15 +8,13 @@ namespace Players_API.Controllers;
 [Route("[controller]")]
 public class PlayersController : ControllerBase
 {
-    const string fileName = "C:/Dev/L'Atelier/Players_API/players.json";
-
-    private readonly JsonSerializerOptions _options;
     private readonly ILogger<PlayersController> _logger;
+    private readonly IPlayerService _playerService;
 
-    public PlayersController(ILogger<PlayersController> logger)
+    public PlayersController(ILogger<PlayersController> logger, IPlayerService playerService)
     {
         _logger = logger;
-        _options = new JsonSerializerOptions { AllowTrailingCommas = true, PropertyNameCaseInsensitive = true };
+        _playerService = playerService;
     }
 
     [HttpGet]
@@ -24,50 +22,22 @@ public class PlayersController : ControllerBase
     {
         _logger.LogTrace("GetPlayers request received");
 
-        if (!System.IO.File.Exists(fileName))
-        {
-            return NotFound("Players file not found");
-        }
-
-        var jsonData = LoadPlayersFile();
-
-        return Ok(jsonData.Players);
+        var players = await _playerService.GetPlayersAsync();
+        return Ok(players.Players);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IEnumerable<Player>>> GetAllPlayers(int id)
+    public async Task<ActionResult<Player>> GetPlayerById(int id)
     {
         _logger.LogTrace("GetPlayers request received");
 
-        if (!System.IO.File.Exists(fileName))
-        {
-            return NotFound("Players file not found");
-        }
+        var player = await _playerService.GetPlayerByIdAsync(id);
 
-        var jsonData = LoadPlayersFile();
-        var player = jsonData.Players.FirstOrDefault(player => player.Id == id);
-        
         if (player == null)
         {
             return NotFound($"Player ID not found ({id})");
         }
 
         return Ok(player);
-    }
-
-    private PlayersFile LoadPlayersFile()
-    {
-        try
-        {
-            var readText = System.IO.File.ReadAllText(fileName);
-            _logger.LogInformation("Json file content : {readText}", readText);
-
-            return JsonSerializer.Deserialize<PlayersFile>(readText, _options);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("Failed to read players file : {ex}", ex);
-            throw;
-        }
     }
 }
