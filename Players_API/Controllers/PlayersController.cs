@@ -22,33 +22,103 @@ public class PlayersController : ControllerBase
     {
         _logger.LogTrace("GetPlayers request received");
 
-        var players = await _playerService.GetPlayersAsync();
-        return Ok(players);
+        try
+        {
+            var players = await _playerService.GetPlayersAsync();
+            if (players == null || !players.Any())
+            {
+                _logger.LogWarning("No players found.");
+                return NoContent();
+            }
+
+            return Ok(players);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving players.");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerDto>> GetPlayerById(int id)
     {
-        _logger.LogTrace("GetPlayerById request received");
+        _logger.LogTrace("GetPlayerById request received for ID: {Id}", id);
 
-        var player = await _playerService.GetPlayerByIdAsync(id);
-
-        if (player == null)
+        try
         {
-            return NotFound($"Player ID not found ({id})");
+            var player = await _playerService.GetPlayerByIdAsync(id);
+
+            if (player == null)
+            {
+                _logger.LogWarning("Player not found with ID: {Id}", id);
+                return NotFound(new { Message = $"Player with ID {id} not found." });
+            }
+
+            return Ok(player);
         }
-
-        return Ok(player);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving player by ID: {Id}", id);
+            return StatusCode(500, "Internal server error");
+        }
     }
-
 
     [HttpGet("best_country")]
     public async Task<ActionResult<IEnumerable<CountryStats>>> GetBestCountry()
     {
         _logger.LogTrace("GetBestCountry request received");
 
-        var country = await _playerService.ComputeBestCountry();
+        try
+        {
+            var country = await _playerService.ComputeBestCountryAsync();
 
-        return Ok(country);
+            if (country == null)
+            {
+                _logger.LogWarning("No country stats found.");
+                return NoContent();
+            }
+
+            return Ok(country);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error computing best country.");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpGet("average_imc")]
+    public async Task<ActionResult<double>> GetAverageIMC()
+    {
+        _logger.LogTrace("GetAverageIMC request received");
+
+        try
+        {
+            var averageIMC = await _playerService.GetAverageIMCAsync();
+            return Ok(averageIMC);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calculating average IMC.");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpGet("median_height")]
+    public async Task<ActionResult<double>> GetMedianHeight()
+    {
+        _logger.LogTrace("GetMedianHeight request received");
+
+        try
+        {
+            var medianHeight = await _playerService.GetMedianHeightAsync();
+            return Ok(medianHeight);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calculating median height.");
+            return StatusCode(500, "Internal server error");
+        }
     }
 }

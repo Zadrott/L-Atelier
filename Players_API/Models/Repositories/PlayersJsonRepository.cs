@@ -32,6 +32,7 @@ public class PlayerJsonRepository : IPlayerRepository
             throw new FileNotFoundException("Players file not found");
         }
 
+        //TODO : Use caching
         var jsonContent = await File.ReadAllTextAsync(_fileName);
         var playerList = JsonSerializer.Deserialize<PlayersList>(jsonContent, _options);
 
@@ -45,6 +46,7 @@ public class PlayerJsonRepository : IPlayerRepository
 
     public async Task<Player> GetPlayerByIdAsync(int id)
     {
+        //TODO : Use caching
         var playersList = await GetAllPlayersAsync();
         var player = playersList.Players.FirstOrDefault(player => player.Id == id);
 

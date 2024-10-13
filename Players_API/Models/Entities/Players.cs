@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Players_API.Models.Entities;
 
 // Using records instead of classes ensure immutability and value-based equality
@@ -13,13 +15,14 @@ public record Player
     public int Id { get; set; }
     public string? Firstname { get; set; }
     public string? Lastname { get; set; }
-    public string? Shortname { get; set; }
-    public string? Sex { get; set; }
+    public required string Shortname { get; set; }
+    public Gender? Sex { get; set; }
     public required Country Country { get; set; }
     public string? Picture { get; set; }
     public required PlayerData Data { get; set; }
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Gender
 {
     M,

@@ -8,5 +8,7 @@ public interface IPlayerService
 {
     Task<List<Player>> GetPlayersAsync();
     Task<Player> GetPlayerByIdAsync(int id);
-    Task<CountryStats> ComputeBestCountry();
+    Task<CountryStats> ComputeBestCountryAsync();
+    Task<float> GetAverageIMCAsync();
+    Task<float> GetMedianHeightAsync();
 }
