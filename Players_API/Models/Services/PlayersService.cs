@@ -135,7 +135,7 @@ public class PlayerService : IPlayerService
         float weightKg = weightG / 1000f;
         float imc = weightKg / (heightM * heightM);
 
-        _logger.LogDebug("IMC computed: {IMC} for weight: {Weight} and height: {HeightCm}", imc, weightKg, heightM);
+        _logger.LogDebug("IMC computed: {IMC} for weight: {Weight} and height: {Height}", imc, weightKg, heightM);
 
         return imc;
     }
